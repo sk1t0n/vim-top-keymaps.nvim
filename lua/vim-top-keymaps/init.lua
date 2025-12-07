@@ -20,10 +20,10 @@ function M.setup()
 end
 
 function M.show()
-  local buf_number = vim.api.nvim_create_buf(false, true)
+  local bufnr = vim.api.nvim_create_buf(false, true)
   local popup_width = 56
   local popup_height = 29
-  M.win_id = vim.api.nvim_open_win(buf_number, true, {
+  M.win_id = vim.api.nvim_open_win(bufnr, true, {
     title = "Vim top keymaps",
     title_pos = "center",
     border = { "╔", "═", "╗", "║", "╝", "═", "╚", "║" },
@@ -63,7 +63,7 @@ function M.show()
     "/ - search forward (n/N - next/previous)",
     ": - command mode",
   }
-  vim.api.nvim_buf_set_lines(buf_number, 1, -1, false, text)
+  vim.api.nvim_buf_set_lines(bufnr, 1, -1, false, text)
 
   vim.o.modifiable = false
   vim.o.number = false
