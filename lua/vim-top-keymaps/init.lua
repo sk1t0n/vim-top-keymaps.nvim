@@ -19,20 +19,7 @@ function M.setup()
   end, { desc = "Toggle VimTopKeymaps" })
 end
 
-function M.show_error()
-  vim.api.nvim_echo(
-    { { "VimTopKeymaps: " }, { "the window width is not full, please close additional windows and try again" } },
-    true,
-    {}
-  )
-end
-
 function M.show()
-  if vim.api.nvim_win_get_width(0) < M.win_width then
-    M.show_error()
-    return
-  end
-
   local buf_number = vim.api.nvim_create_buf(false, true)
   local popup_width = 56
   local popup_height = 29
@@ -87,17 +74,34 @@ function M.show()
   vim.o.wrap = true
 end
 
-function M.hide()
-  if vim.api.nvim_win_is_valid(M.win_id) then
-    vim.api.nvim_win_close(M.win_id, true)
-    M.win_id = nil
-    M.reset_opts()
+local function is_zen_mode()
+  local round = function(n)
+    return math.floor(n + 0.5)
+  end
+  local w = vim.api.nvim_win_get_width(0)
+  return w >= round(M.win_width * 0.75) and w <= round(M.win_width * 0.9)
+end
+
+local function show_error()
+  vim.api.nvim_echo({ { "VimTopKeymaps: " }, { "in Zen mode, you can't close the window" } }, true, {})
+end
+
+local function reset_opts()
+  for k, v in pairs(M.default_opts) do
+    vim.o[k] = v
   end
 end
 
-function M.reset_opts()
-  for k, v in pairs(M.default_opts) do
-    vim.o[k] = v
+function M.hide()
+  if is_zen_mode() then
+    show_error()
+    return
+  end
+
+  if vim.api.nvim_win_is_valid(M.win_id) then
+    vim.api.nvim_win_close(M.win_id, true)
+    M.win_id = nil
+    reset_opts()
   end
 end
 
